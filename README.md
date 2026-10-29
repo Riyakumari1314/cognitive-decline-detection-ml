@@ -1,4 +1,41 @@
 # Cognitive Decline Detection Using Speech and Typing Patterns
+# Multimodal Cognitive Decline Detection via Passive Digital Biomarkers
+
+An end-to-end machine learning pipeline for early detection of cognitive decline using **spontaneous speech/linguistic markers** and **keystroke/typing dynamics**. The framework evaluates unimodal classifiers alongside a participant-matched **Early Fusion Multimodal Classifier**.
+
+---
+
+## Project Architecture
+
+```text
+cognitive-decline-detection-ml/
+├── data/
+│   ├── docs/
+│   │   └── methodology.md          # Experimental protocol & zero-leakage split design
+│   ├── speech_benchmark.csv        # Participant speech & linguistic benchmark records
+│   └── typing_benchmark.csv        # Participant-matched keystroke dynamics records
+├── results/
+│   ├── speech_model_cm.png         # Speech Unimodal Confusion Matrix
+│   ├── typing_model_cm.png         # Typing Unimodal Confusion Matrix
+│   └── multimodal_model_cm.png     # Multimodal Fusion Confusion Matrix
+├── src/
+│   ├── preprocessing/
+│   │   ├── speech_preprocessing.py # Median imputation & boundary validation (Speech)
+│   │   └── typing_preprocessing.py # Median imputation & boundary validation (Typing)
+│   ├── features/
+│   │   ├── speech_features.py      # 8 clinical linguistic & acoustic-proxy biomarkers
+│   │   └── typing_features.py      # 8 motor-cognitive keystroke biomarkers
+│   ├── models/
+│   │   ├── speech_model.py         # StandardScaler + RandomForest (5-Fold CV)
+│   │   ├── typing_model.py         # StandardScaler + RandomForest (5-Fold CV)
+│   │   └── multimodal_model.py     # Feature Fusion + GradientBoosting (5-Fold CV)
+│   └── evaluation/
+│       ├── metrics.py              # Accuracy, Precision, Recall, F1-Score, ROC-AUC
+│       └── confusion_matrix.py     # Confusion matrix plotting & export
+├── download_benchmarks.py          # Automated dataset ingestion & formatting script
+├── main.py                         # End-to-end training & evaluation entrypoint
+└── requirements.txt                # Project dependencies
+
 
 ## Overview
 
