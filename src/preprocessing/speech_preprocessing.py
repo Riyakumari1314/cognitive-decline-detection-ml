@@ -1,16 +1,51 @@
-"""
-Speech preprocessing module.
-"""
-
 import pandas as pd
 
 
-def preprocess_speech(df: pd.DataFrame) -> pd.DataFrame:
-    """Clean and validate raw speech benchmark data."""
+def _validate_and_impute(df, required_cols, min_values):
+    """Validate features and impute numeric missing values."""
     df = df.copy()
-    numeric_cols = df.select_dtypes(include=["number"]).columns
-    df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
-    df["audio_duration_sec"] = df["audio_duration_sec"].clip(lower=1.0)
-    df["word_count"] = df["word_count"].clip(lower=1)
-    df["sentence_count"] = df["sentence_count"].clip(lower=1)
+
+    missing_cols = set(required_cols) - set(df.columns)
+    if missing_cols:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing_cols)}"
+        )
+
+    # Keep labels and identifiers out of numeric imputation.
+    feature_cols = [
+        c for c in df.select_dtypes(include="number").columns
+        if c not in {"label"}
+    ]
+
+    for col in feature_cols:
+        df[col] = df[col].fillna(df[col].median())
+
+    for col, minimum in min_values.items():
+        df[col] = df[col].clip(lower=minimum)
+
+    if "label" in df.columns:
+        if df["label"].isna().any():
+            raise ValueError("Missing target labels found.")
+
+        if not set(df["label"].unique()).issubset({0, 1}):
+            raise ValueError("Expected binary labels 0 and 1.")
+
     return df
+
+
+def preprocess_speech(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean and validate speech benchmark data."""
+    return _validate_and_impute(
+        df,
+        required_cols=[
+            "audio_duration_sec",
+            "word_count",
+            "sentence_count",
+            "label",
+        ],
+        min_values={
+            "audio_duration_sec": 1.0,
+            "word_count": 1,
+            "sentence_count": 1,
+        },
+    )
