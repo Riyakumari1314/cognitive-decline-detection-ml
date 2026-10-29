@@ -8,7 +8,7 @@ Class labels:
 0 = Healthy Control
 1 = Cognitive Decline
 """
-
+import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
@@ -43,6 +43,8 @@ def plot_confusion_matrix(y_true, y_pred, model_name="Model"):
     plt.xlabel("Predicted Label")
     plt.ylabel("Actual Label")
     plt.tight_layout()
+    os.makedirs("results", exist_ok=True)
+    plt.savefig(f"results/{model_name.lower().replace(' ', '_')}_cm.png", dpi=300)
     plt.show()
 
     return cm
